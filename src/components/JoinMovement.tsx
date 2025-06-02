@@ -128,7 +128,7 @@ const JoinMovement = () => {
             transition={{ duration: 0.8, delay: 0.5 }}
             viewport={{ once: true }}
           >
-            Be part of Tamil Nadu's thriving startup ecosystem. Transform your innovative ideas 
+            Be part of India's thriving startup ecosystem. Transform your innovative ideas 
             into successful businesses with our comprehensive support and world-class infrastructure.
           </motion.p>
 
@@ -169,7 +169,7 @@ const JoinMovement = () => {
             viewport={{ once: true }}
           >
             <div className="text-blue-200 text-sm">Trusted by</div>
-            <div className="text-white font-semibold">Government of Tamil Nadu</div>
+            <div className="text-white font-semibold">Government of India</div>
             <div className="text-blue-200">•</div>
             <div className="text-white font-semibold">Leading VCs</div>
             <div className="text-blue-200">•</div>
