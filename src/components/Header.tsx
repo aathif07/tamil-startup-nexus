@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
@@ -12,20 +11,39 @@ const Header = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navItems = [
-    'Home', 'About', 'Initiatives', 'Startup Ecosystem', 
-    'News & Events', 'Contact'
+    { name: 'Home', href: '#HeroSection' },
+    { name: 'About', href: '#about' },
+    { name: 'Services', href: '#services' },
+    { name: 'Initiatives', href: '#initiatives' },
+    { name: 'Startup Ecosystem', href: '#startup-ecosystem' },
+    { name: 'News & Events', href: '#news-events' },
+    { name: 'Contact', href: '#contact' }
   ];
+
+  const handleNavClick = (href: string) => {
+    setIsMobileMenuOpen(false);
+    
+    // Smooth scroll to section
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
 
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/90 backdrop-blur-md shadow-lg border-b border-gray-200/20' 
+        isScrolled
+          ? 'bg-white/90 backdrop-blur-md shadow-lg border-b border-gray-200/20'
           : 'bg-transparent'
       }`}
       initial={{ y: -100 }}
@@ -51,17 +69,17 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
             {navItems.map((item, index) => (
-              <motion.a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-                className="text-gray-700 hover:text-red-600 font-medium transition-colors duration-200 relative group"
+              <motion.button
+                key={item.name}
+                onClick={() => handleNavClick(item.href)}
+                className="text-gray-700 hover:text-red-600 font-medium transition-colors duration-200 relative group cursor-pointer bg-transparent border-none"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                {item}
+                {item.name}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full"></span>
-              </motion.a>
+              </motion.button>
             ))}
           </nav>
 
@@ -72,7 +90,10 @@ const Header = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5 }}
           >
-            <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 shadow-lg">
+            <Button 
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 shadow-lg"
+              onClick={() => handleNavClick('#contact')}
+            >
               Apply Now
             </Button>
           </motion.div>
@@ -98,16 +119,18 @@ const Header = () => {
             >
               <nav className="flex flex-col space-y-4">
                 {navItems.map((item) => (
-                  <a
-                    key={item}
-                    href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="text-gray-700 hover:text-red-600 font-medium py-2 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                  <button
+                    key={item.name}
+                    onClick={() => handleNavClick(item.href)}
+                    className="text-gray-700 hover:text-red-600 font-medium py-2 transition-colors text-left bg-transparent border-none cursor-pointer"
                   >
-                    {item}
-                  </a>
+                    {item.name}
+                  </button>
                 ))}
-                <Button className="bg-red-600 hover:bg-red-700 text-white w-full mt-4">
+                <Button 
+                  className="bg-red-600 hover:bg-red-700 text-white w-full mt-4"
+                  onClick={() => handleNavClick('#contact')}
+                >
                   Apply Now
                 </Button>
               </nav>
