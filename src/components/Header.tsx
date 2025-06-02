@@ -62,7 +62,7 @@ const Header = () => {
               <span className="text-white font-bold text-lg">SD</span>
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
-              STARTUP DOTIN
+              StartUPdotIN
             </h1>
           </motion.div>
 
