@@ -43,7 +43,7 @@ const ContactSection = () => {
     {
       icon: MapPin,
       title: 'Visit Us',
-      info: 'Anna Salai, Chennai, Tamil Nadu 600002',
+      info: 'Anna Salai, Chennai, India 600002',
       action: '#'
     }
   ];
@@ -139,7 +139,7 @@ const ContactSection = () => {
               <div className="text-center">
                 <MapPin size={48} className="text-gray-500 mx-auto mb-2" />
                 <p className="text-gray-600 font-medium">Interactive Map</p>
-                <p className="text-sm text-gray-500">Chennai, Tamil Nadu</p>
+                <p className="text-sm text-gray-500">Chennai, India</p>
               </div>
             </motion.div>
           </motion.div>
