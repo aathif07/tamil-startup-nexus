@@ -1,50 +1,62 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Users, Zap, DollarSign, Calendar, Lightbulb, FileText } from 'lucide-react';
+import { Users, Zap, DollarSign, Calendar, Lightbulb, FileText, Building, Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const ServicesSection = () => {
   const services = [
     {
+      icon: Building,
+      title: 'Startup Incorporation',
+      description: 'Complete startup incorporation services including company registration, legal documentation, and compliance setup.',
+      price: '₹10,000',
+      color: 'from-red-500 to-pink-500',
+      features: ['Company Registration', 'Legal Documentation', 'Compliance Setup', 'Tax Registration']
+    },
+    {
+      icon: Globe,
+      title: 'Website Development & Maintenance',
+      description: 'Professional website development and ongoing maintenance services tailored for startups and businesses.',
+      price: 'Get Quote',
+      color: 'from-blue-500 to-cyan-500',
+      features: ['Custom Design', 'Responsive Layout', 'SEO Optimization', 'Ongoing Support']
+    },
+    {
       icon: Users,
       title: 'Startup Support & Mentorship',
       description: 'Connect with experienced mentors and receive guidance on business strategy, product development, and market entry.',
-      color: 'from-red-500 to-pink-500'
+      price: 'Free Consultation',
+      color: 'from-green-500 to-emerald-500',
+      features: ['1-on-1 Mentoring', 'Business Strategy', 'Market Analysis', 'Growth Planning']
     },
     {
       icon: Zap,
       title: 'Incubation & Acceleration',
       description: 'Comprehensive incubation programs designed to accelerate your startup journey from idea to market.',
-      color: 'from-blue-500 to-cyan-500'
+      price: 'Program Based',
+      color: 'from-purple-500 to-violet-500',
+      features: ['3-6 Month Programs', 'Workspace Access', 'Expert Guidance', 'Demo Day']
     },
     {
       icon: DollarSign,
       title: 'Funding & Grants',
       description: 'Access to various funding opportunities, government grants, and investor networks to fuel your growth.',
-      color: 'from-green-500 to-emerald-500'
+      price: 'Success Fee',
+      color: 'from-orange-500 to-amber-500',
+      features: ['Investor Connect', 'Grant Applications', 'Pitch Preparation', 'Due Diligence']
     },
     {
       icon: Calendar,
       title: 'Networking Events',
       description: 'Regular events, workshops, and conferences to connect with fellow entrepreneurs and industry experts.',
-      color: 'from-purple-500 to-violet-500'
-    },
-    {
-      icon: Lightbulb,
-      title: 'Innovation Labs',
-      description: 'State-of-the-art facilities and resources for research, development, and prototyping your innovative ideas.',
-      color: 'from-orange-500 to-amber-500'
-    },
-    {
-      icon: FileText,
-      title: 'Startup Policy Guidance',
-      description: 'Expert guidance on government policies, compliance requirements, and regulatory frameworks for startups.',
-      color: 'from-indigo-500 to-blue-500'
+      price: 'Free - ₹2,000',
+      color: 'from-indigo-500 to-blue-500',
+      features: ['Monthly Meetups', 'Workshops', 'Conferences', 'Online Events']
     }
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+    <section id="services" className="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
       <div className="container mx-auto px-6">
         <motion.div
           className="text-center mb-16"
@@ -85,26 +97,85 @@ const ServicesSection = () => {
                 >
                   <service.icon size={32} className="text-white" />
                 </motion.div>
-
+                
                 {/* Content */}
                 <div className="relative z-10">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3 group-hover:text-gray-900 transition-colors">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-xl font-semibold text-gray-800 group-hover:text-gray-900 transition-colors">
+                      {service.title}
+                    </h3>
+                    <span className={`text-lg font-bold bg-gradient-to-r ${service.color} bg-clip-text text-transparent`}>
+                      {service.price}
+                    </span>
+                  </div>
+                  
+                  <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors mb-4">
                     {service.description}
                   </p>
-                </div>
 
+                  {/* Features List */}
+                  <ul className="space-y-2 mb-6">
+                    {service.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center text-sm text-gray-600">
+                        <div className={`w-2 h-2 bg-gradient-to-r ${service.color} rounded-full mr-2`}></div>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* CTA Button */}
+                  <Button 
+                    className={`w-full bg-gradient-to-r ${service.color} text-white hover:opacity-90 transition-opacity`}
+                    size="sm"
+                  >
+                    {service.price === 'Get Quote' ? 'Get Your Price' : 
+                     service.price === 'Free Consultation' ? 'Book Consultation' : 
+                     'Learn More'}
+                  </Button>
+                </div>
+                
                 {/* Hover Effect Overlay */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
-
+              
               {/* 3D Shadow Effect */}
               <div className={`absolute inset-0 bg-gradient-to-br ${service.color} rounded-2xl opacity-20 blur-xl transform translate-y-4 group-hover:translate-y-6 transition-transform duration-300`} />
             </motion.div>
           ))}
         </div>
+
+        {/* Special Offers Section */}
+        <motion.div
+          className="mt-16 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 max-w-4xl mx-auto border border-white/20">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              Special Package Deals
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-gradient-to-r from-red-500 to-pink-500 rounded-xl p-6 text-white">
+                <h4 className="text-xl font-semibold mb-2">Startup Complete Package</h4>
+                <p className="mb-3">Incorporation + Website Development</p>
+                <div className="text-2xl font-bold">₹25,000 <span className="text-sm line-through opacity-75">₹35,000</span></div>
+                <Button className="mt-4 bg-white text-red-500 hover:bg-gray-100">
+                  Get Started
+                </Button>
+              </div>
+              <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-6 text-white">
+                <h4 className="text-xl font-semibold mb-2">Growth Package</h4>
+                <p className="mb-3">Website + 6 Months Maintenance + Mentorship</p>
+                <div className="text-2xl font-bold">Contact Us</div>
+                <Button className="mt-4 bg-white text-blue-500 hover:bg-gray-100">
+                  Get Quote
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
