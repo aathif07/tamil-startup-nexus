@@ -15,7 +15,7 @@ const ResourcesSection = () => {
       description: 'Comprehensive policy documents and guidelines',
       color: 'from-blue-500 to-cyan-500',
       resources: [
-        { name: 'Tamil Nadu Startup Policy 2024', type: 'PDF', size: '2.5 MB' },
+        { name: 'India Startup Policy 2024', type: 'PDF', size: '2.5 MB' },
         { name: 'Intellectual Property Guidelines', type: 'PDF', size: '1.8 MB' },
         { name: 'Tax Benefits for Startups', type: 'PDF', size: '1.2 MB' },
         { name: 'Regulatory Compliance Checklist', type: 'PDF', size: '950 KB' }
