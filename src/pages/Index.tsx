@@ -9,7 +9,6 @@ import InitiativesSection from '../components/InitiativesSection';
 import EcosystemMap from '../components/EcosystemMap';
 import StartupStories from '../components/StartupStories';
 import NewsEvents from '../components/NewsEvents';
-import ResourcesSection from '../components/ResourcesSection';
 import JoinMovement from '../components/JoinMovement';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
@@ -35,7 +34,6 @@ const Index = () => {
         <EcosystemMap />
         <StartupStories />
         <NewsEvents />
-        <ResourcesSection />
         <JoinMovement />
         <ContactSection />
         <Footer />
