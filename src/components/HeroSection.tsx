@@ -51,7 +51,7 @@ const HeroSection = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
-              in Tamil Nadu
+              in India
             </motion.span>
           </motion.h1>
 
