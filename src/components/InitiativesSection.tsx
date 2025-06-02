@@ -9,8 +9,8 @@ const InitiativesSection = () => {
   const initiatives = [
     {
       icon: Globe,
-      title: 'Tamil Nadu Startup and Innovation Mission',
-      description: 'A comprehensive mission to establish Tamil Nadu as a global startup hub, fostering innovation and entrepreneurship across all sectors.',
+      title: 'India Startup and Innovation Mission',
+      description: 'A comprehensive mission to establish India as a global startup hub, fostering innovation and entrepreneurship across all sectors.',
       highlights: ['Policy Framework', 'Infrastructure Development', 'Global Partnerships', 'Innovation Ecosystem'],
       color: 'from-blue-500 to-cyan-500'
     },
