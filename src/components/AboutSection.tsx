@@ -8,7 +8,7 @@ const AboutSection = () => {
     {
       icon: Target,
       title: 'Mission',
-      description: 'To foster a thriving ecosystem for innovation and startups across Tamil Nadu'
+      description: 'To foster a thriving ecosystem for innovation and startups across India'
     },
     {
       icon: Eye,
