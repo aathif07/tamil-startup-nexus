@@ -95,14 +95,6 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1 }}
         >
-          <motion.div
-            className="flex flex-col items-center text-gray-500"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <span className="text-sm mb-2">Scroll to explore</span>
-            <ArrowDown size={20} />
-          </motion.div>
         </motion.div>
       </div>
     </section>
