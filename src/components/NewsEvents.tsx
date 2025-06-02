@@ -11,7 +11,7 @@ const NewsEvents = () => {
     {
       id: 1,
       type: 'news',
-      title: 'Tamil Nadu Tops Startup Ranking for Third Consecutive Year',
+      title: 'India Tops Startup Ranking for Third Consecutive Year',
       excerpt: 'The state continues to lead in innovation and entrepreneurship support...',
       date: '2024-01-15',
       category: 'Achievement'
@@ -85,7 +85,7 @@ const NewsEvents = () => {
             Latest News & Events
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Stay updated with the latest developments in Tamil Nadu's startup ecosystem
+            Stay updated with the latest developments in India's startup ecosystem
           </p>
         </motion.div>
 
@@ -128,7 +128,7 @@ const NewsEvents = () => {
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           >
             <span className="font-semibold whitespace-nowrap">BREAKING:</span>
-            <span className="whitespace-nowrap">Tamil Nadu announces ₹1000 crore startup fund</span>
+            <span className="whitespace-nowrap">India announces ₹1000 crore startup fund</span>
             <span className="whitespace-nowrap">•</span>
             <span className="whitespace-nowrap">New incubation centers in 10 districts</span>
             <span className="whitespace-nowrap">•</span>
