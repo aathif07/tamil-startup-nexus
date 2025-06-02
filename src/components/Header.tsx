@@ -17,7 +17,7 @@ const Header = () => {
   }, []);
 
   const navItems = [
-    { name: 'Home', href: '#/' },
+    { name: 'Home', href: '#home' },
     { name: 'About', href: '#about' },
     { name: 'Services', href: '#services' },
     { name: 'Initiatives', href: '#initiatives' },
@@ -29,14 +29,30 @@ const Header = () => {
   const handleNavClick = (href: string) => {
     setIsMobileMenuOpen(false);
     
-    // Smooth scroll to section
+    // Handle home navigation - scroll to top or specific home section
+    if (href === '#home') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      return;
+    }
+    
+    // Smooth scroll to other sections
     const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ 
+      element.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
     }
+  };
+
+  const handleLogoClick = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   return (
@@ -52,11 +68,12 @@ const Header = () => {
     >
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo - Clickable to go to home */}
           <motion.div
-            className="flex items-center space-x-3"
+            className="flex items-center space-x-3 cursor-pointer"
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400 }}
+            onClick={handleLogoClick}
           >
             <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">SD</span>
