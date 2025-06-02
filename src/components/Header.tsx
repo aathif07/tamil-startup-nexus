@@ -18,7 +18,7 @@ const Header = () => {
 
   const navItems = [
     'Home', 'About', 'Initiatives', 'Startup Ecosystem', 
-    'News & Events', 'Resources', 'Contact'
+    'News & Events', 'Contact'
   ];
 
   return (
