@@ -41,7 +41,7 @@ const EcosystemMap = () => {
     {
       id: 4,
       type: 'investor',
-      name: 'Tamil Nadu Venture Fund',
+      name: 'India Venture Fund',
       location: 'Chennai',
       description: 'Early-stage venture capital fund',
       coordinates: { x: 50, y: 55 },
@@ -74,7 +74,7 @@ const EcosystemMap = () => {
             Startup Ecosystem Map
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Explore the vibrant startup ecosystem across Tamil Nadu
+            Explore the vibrant startup ecosystem across India
           </p>
         </motion.div>
 
@@ -87,7 +87,7 @@ const EcosystemMap = () => {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            {/* Tamil Nadu Map Outline */}
+            {/* India Map Outline */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-200/30 to-red-200/30">
               <svg viewBox="0 0 100 100" className="w-full h-full opacity-20">
                 <path
