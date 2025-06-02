@@ -63,7 +63,7 @@ const Footer = () => {
                 </h3>
               </div>
               <p className="text-gray-300 mb-6 leading-relaxed">
-                Empowering Tamil Nadu's startup ecosystem through innovation, 
+                Empowering India's startup ecosystem through innovation, 
                 mentorship, and comprehensive support for entrepreneurs.
               </p>
               
@@ -79,7 +79,7 @@ const Footer = () => {
                 </div>
                 <div className="flex items-center space-x-3 text-gray-300">
                   <MapPin size={16} />
-                  <span className="text-sm">Chennai, Tamil Nadu</span>
+                  <span className="text-sm">Chennai, India</span>
                 </div>
               </div>
             </motion.div>
@@ -128,7 +128,7 @@ const Footer = () => {
                 © 2024 Startup Dotin. All rights reserved.
               </p>
               <p className="text-gray-400 text-xs mt-1">
-                Government of Tamil Nadu Initiative
+                Government of India Initiative
               </p>
             </div>
 
