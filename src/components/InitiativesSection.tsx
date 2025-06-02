@@ -55,29 +55,30 @@ const InitiativesSection = () => {
           </p>
         </motion.div>
 
-        {/* Tab Navigation */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {initiatives.map((initiative, index) => (
-            <motion.button
-              key={initiative.title}
-              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                activeTab === index
-                  ? 'bg-gradient-to-r from-red-500 to-blue-500 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-              onClick={() => setActiveTab(index)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <div className="flex items-center space-x-2">
-                <initiative.icon size={20} />
-                <span className="hidden sm:inline">{initiative.title}</span>
-              </div>
-            </motion.button>
-          ))}
+          {initiatives.map((initiative, index) => {
+            const IconComponent = initiative.icon;
+            return (
+              <motion.button
+                key={initiative.title}
+                className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                  activeTab === index
+                    ? 'bg-gradient-to-r from-red-500 to-blue-500 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                onClick={() => setActiveTab(index)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="flex items-center space-x-2">
+                  <IconComponent size={20} />
+                  <span className="hidden sm:inline">{initiative.title}</span>
+                </div>
+              </motion.button>
+            );
+          })}
         </div>
 
-        {/* Tab Content */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -87,7 +88,6 @@ const InitiativesSection = () => {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Content */}
             <div className="order-2 lg:order-1">
               <motion.div
                 className={`inline-flex items-center space-x-3 px-4 py-2 bg-gradient-to-r ${initiatives[activeTab].color} rounded-full text-white mb-6`}
@@ -95,7 +95,7 @@ const InitiativesSection = () => {
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <initiatives[activeTab].icon size={24} />
+                {React.createElement(initiatives[activeTab].icon, { size: 24 })}
                 <span className="font-semibold">{initiatives[activeTab].title}</span>
               </motion.div>
 
@@ -132,7 +132,6 @@ const InitiativesSection = () => {
               </motion.div>
             </div>
 
-            {/* Visual */}
             <motion.div
               className="order-1 lg:order-2"
               initial={{ opacity: 0, scale: 0.9 }}
@@ -145,11 +144,13 @@ const InitiativesSection = () => {
                   animate={{ y: [-10, 10, -10] }}
                   transition={{ duration: 4, repeat: Infinity }}
                 >
-                  <initiatives[activeTab].icon size={80} className="mx-auto mb-4 opacity-20" />
+                  {React.createElement(initiatives[activeTab].icon, { 
+                    size: 80, 
+                    className: "mx-auto mb-4 opacity-20" 
+                  })}
                   <h3 className="text-2xl font-bold opacity-90">{initiatives[activeTab].title}</h3>
                 </motion.div>
                 
-                {/* Floating Elements */}
                 {[...Array(3)].map((_, i) => (
                   <motion.div
                     key={i}
