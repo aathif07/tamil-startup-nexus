@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, Linkedin, Twitter, Youtube } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,33 +26,6 @@ const ContactSection = () => {
     // Handle form submission
   };
 
-  const contactInfo = [
-    {
-      icon: Mail,
-      title: 'Email Us',
-      info: 'hello@startupdontin.gov.in',
-      action: 'mailto:hello@startupdontin.gov.in'
-    },
-    {
-      icon: Phone,
-      title: 'Call Us',
-      info: '+91 44 2345 6789',
-      action: 'tel:+914423456789'
-    },
-    {
-      icon: MapPin,
-      title: 'Visit Us',
-      info: 'Anna Salai, Chennai, India 600002',
-      action: '#'
-    }
-  ];
-
-  const socialLinks = [
-    { icon: Linkedin, url: '#', color: 'bg-blue-600' },
-    { icon: Twitter, url: '#', color: 'bg-sky-500' },
-    { icon: Youtube, url: '#', color: 'bg-red-600' }
-  ];
-
   return (
     <section id="contact" className="py-20 bg-white relative overflow-hidden">
       <div className="container mx-auto px-6">
@@ -72,84 +44,14 @@ const ContactSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-16 max-w-6xl mx-auto">
-          {/* Contact Information */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h3 className="text-2xl font-bold text-gray-800 mb-8">
-              Connect With Us
-            </h3>
-
-            <div className="space-y-6 mb-10">
-              {contactInfo.map((contact, index) => (
-                <motion.a
-                  key={contact.title}
-                  href={contact.action}
-                  className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-300 group"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-red-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <contact.icon size={24} className="text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">{contact.title}</h4>
-                    <p className="text-gray-600">{contact.info}</p>
-                  </div>
-                </motion.a>
-              ))}
-            </div>
-
-            {/* Social Links */}
-            <div>
-              <h4 className="text-lg font-semibold text-gray-800 mb-4">Follow Us</h4>
-              <div className="flex space-x-4">
-                {socialLinks.map((social, index) => (
-                  <motion.a
-                    key={index}
-                    href={social.url}
-                    className={`w-12 h-12 ${social.color} rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform duration-300`}
-                    initial={{ opacity: 0, scale: 0 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 + 0.3 }}
-                    viewport={{ once: true }}
-                    whileHover={{ y: -2 }}
-                  >
-                    <social.icon size={20} />
-                  </motion.a>
-                ))}
-              </div>
-            </div>
-
-            {/* Map Placeholder */}
-            <motion.div
-              className="mt-10 h-64 bg-gradient-to-br from-blue-100 to-red-100 rounded-2xl flex items-center justify-center"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <div className="text-center">
-                <MapPin size={48} className="text-gray-500 mx-auto mb-2" />
-                <p className="text-gray-600 font-medium">Interactive Map</p>
-                <p className="text-sm text-gray-500">Chennai, India</p>
-              </div>
-            </motion.div>
-          </motion.div>
-
+        <div className="flex justify-center">
           {/* Contact Form */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
+            className="w-full max-w-2xl"
           >
             <div className="bg-gradient-to-br from-blue-50 to-red-50 rounded-2xl p-8 shadow-lg">
               <h3 className="text-2xl font-bold text-gray-800 mb-6">
