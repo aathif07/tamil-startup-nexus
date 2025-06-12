@@ -52,7 +52,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
       {/* Sidebar */}
       <motion.div
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
@@ -62,12 +62,12 @@ const AdminDashboard = () => {
         animate={{ x: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex items-center justify-between p-6 border-b">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SD</span>
+        <div className="flex items-center justify-between p-4 lg:p-6 border-b">
+          <div className="flex items-center space-x-2 lg:space-x-3">
+            <div className="w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-red-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xs lg:text-sm">SD</span>
             </div>
-            <h1 className="text-lg font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-base lg:text-lg font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
               Admin Panel
             </h1>
           </div>
@@ -75,11 +75,11 @@ const AdminDashboard = () => {
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-1 rounded-md hover:bg-gray-100"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        <nav className="mt-6">
+        <nav className="mt-4 lg:mt-6">
           {menuItems.map((item) => (
             <button
               key={item.id}
@@ -87,25 +87,26 @@ const AdminDashboard = () => {
                 setActiveTab(item.id);
                 setSidebarOpen(false);
               }}
-              className={`w-full flex items-center space-x-3 px-6 py-3 text-left transition-colors ${
+              className={`w-full flex items-center space-x-3 px-4 lg:px-6 py-3 text-left transition-colors ${
                 activeTab === item.id
                   ? 'bg-red-50 text-red-600 border-r-2 border-red-600'
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <item.icon size={20} />
-              <span>{item.label}</span>
+              <item.icon size={18} />
+              <span className="text-sm lg:text-base">{item.label}</span>
             </button>
           ))}
         </nav>
 
-        <div className="absolute bottom-6 left-6 right-6">
+        <div className="absolute bottom-4 lg:bottom-6 left-4 lg:left-6 right-4 lg:right-6">
           <Button
             onClick={handleLogout}
             variant="outline"
-            className="w-full flex items-center space-x-2"
+            className="w-full flex items-center space-x-2 text-sm"
+            size="sm"
           >
-            <LogOut size={16} />
+            <LogOut size={14} />
             <span>Logout</span>
           </Button>
         </div>
@@ -120,30 +121,30 @@ const AdminDashboard = () => {
       )}
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-0">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b px-6 py-4">
+        <header className="bg-white shadow-sm border-b px-4 lg:px-6 py-3 lg:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 lg:space-x-4">
               <button
                 onClick={() => setSidebarOpen(true)}
                 className="lg:hidden p-2 rounded-md hover:bg-gray-100"
               >
-                <Menu size={20} />
+                <Menu size={18} />
               </button>
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-lg lg:text-2xl font-bold text-gray-800 truncate">
                 {menuItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
               </h2>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Welcome, Admin</span>
-              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-blue-600 rounded-full"></div>
+            <div className="flex items-center space-x-2 lg:space-x-4">
+              <span className="text-xs lg:text-sm text-gray-600 hidden sm:inline">Welcome, Admin</span>
+              <div className="w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-red-500 to-blue-600 rounded-full"></div>
             </div>
           </div>
         </header>
 
         {/* Main Content Area */}
-        <main className="p-6">
+        <main className="flex-1 p-4 lg:p-6 overflow-auto">
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, y: 20 }}
