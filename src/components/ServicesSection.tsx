@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Zap, DollarSign, Calendar, Lightbulb, FileText, Building, Globe } from 'lucide-react';
@@ -11,6 +12,8 @@ const ServicesSection = () => {
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     
     if (!isAuthenticated) {
+      // Store the intended destination for after login
+      localStorage.setItem('redirectAfterLogin', '/startup-incorporation');
       navigate('/login');
     } else {
       navigate('/startup-incorporation');
