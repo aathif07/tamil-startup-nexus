@@ -8,18 +8,29 @@ import { Badge } from '@/components/ui/badge';
 
 interface IncorporationApplication {
   applicationId: string;
-  companyName: string;
-  businessType: string;
-  industry: string;
-  contactPerson: string;
-  phoneNumber: string;
-  email: string;
+  studentName: string;
+  roleNumber: string;
+  schoolOfStudy: string;
+  contactNumber: string;
+  director1PanCard: string;
+  director2PanCard: string;
+  director1Identity: string;
+  director2Identity: string;
+  director1Mobile: string;
+  director1Email: string;
+  director2Mobile: string;
+  director2Email: string;
+  companyNames: string;
+  businessNature: string;
+  director1AddressProof: string;
+  director2AddressProof: string;
+  businessPlaceProof: string;
+  nocFromOwner: string;
+  shareCapital: string;
+  shareBreakup: string;
+  companyAddress: string;
   status: 'pending' | 'approved' | 'rejected' | 'in-progress';
   submittedAt: string;
-  estimatedCompletion: string;
-  authorizedCapital: string;
-  paidUpCapital: string;
-  founders: string;
   [key: string]: any;
 }
 
@@ -92,62 +103,66 @@ const StartupIncorporationManagement = () => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Building size={24} />
-              <span>{selectedApplication.companyName}</span>
+              <span>{selectedApplication.studentName} - Application</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Basic Information */}
+              {/* Student Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Basic Information</h3>
+                <h3 className="text-lg font-semibold border-b pb-2">Student Information</h3>
                 <div className="space-y-2">
                   <p><strong>Application ID:</strong> {selectedApplication.applicationId}</p>
-                  <p><strong>Business Type:</strong> {selectedApplication.businessType}</p>
-                  <p><strong>Industry:</strong> {selectedApplication.industry}</p>
-                  <p><strong>Number of Founders:</strong> {selectedApplication.founders}</p>
+                  <p><strong>Student Name:</strong> {selectedApplication.studentName}</p>
+                  <p><strong>Role Number:</strong> {selectedApplication.roleNumber}</p>
+                  <p><strong>School of Study:</strong> {selectedApplication.schoolOfStudy}</p>
+                  <p><strong>Contact Number:</strong> {selectedApplication.contactNumber}</p>
                   <p><strong>Submitted:</strong> {new Date(selectedApplication.submittedAt).toLocaleDateString()}</p>
                 </div>
               </div>
 
-              {/* Contact Information */}
+              {/* Director 1 Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Contact Information</h3>
+                <h3 className="text-lg font-semibold border-b pb-2">Director 1 Information</h3>
                 <div className="space-y-2">
-                  <p className="flex items-center space-x-2">
-                    <span><strong>Contact Person:</strong> {selectedApplication.contactPerson}</span>
-                  </p>
+                  <p><strong>PAN Card:</strong> {selectedApplication.director1PanCard}</p>
+                  <p><strong>Identity Proof:</strong> {selectedApplication.director1Identity}</p>
                   <p className="flex items-center space-x-2">
                     <Phone size={16} />
-                    <span>{selectedApplication.phoneNumber}</span>
+                    <span>{selectedApplication.director1Mobile}</span>
                   </p>
                   <p className="flex items-center space-x-2">
                     <Mail size={16} />
-                    <span>{selectedApplication.email}</span>
+                    <span>{selectedApplication.director1Email}</span>
+                  </p>
+                  <p><strong>Address Proof:</strong> {selectedApplication.director1AddressProof}</p>
+                </div>
+              </div>
+
+              {/* Director 2 Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold border-b pb-2">Director 2 Information</h3>
+                <div className="space-y-2">
+                  <p><strong>PAN Card:</strong> {selectedApplication.director2PanCard}</p>
+                  <p><strong>Identity Proof:</strong> {selectedApplication.director2Identity}</p>
+                  <p className="flex items-center space-x-2">
+                    <Phone size={16} />
+                    <span>{selectedApplication.director2Mobile}</span>
                   </p>
                   <p className="flex items-center space-x-2">
-                    <Calendar size={16} />
-                    <span>Preferred Completion: {selectedApplication.preferredCompletionDate || 'Not specified'}</span>
+                    <Mail size={16} />
+                    <span>{selectedApplication.director2Email}</span>
                   </p>
+                  <p><strong>Address Proof:</strong> {selectedApplication.director2AddressProof}</p>
                 </div>
               </div>
 
-              {/* Capital Structure */}
+              {/* Business & Documents */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Capital Structure</h3>
+                <h3 className="text-lg font-semibold border-b pb-2">Business & Documents</h3>
                 <div className="space-y-2">
-                  <p><strong>Authorized Capital:</strong> ₹{selectedApplication.authorizedCapital}</p>
-                  <p><strong>Paid-up Capital:</strong> ₹{selectedApplication.paidUpCapital}</p>
-                  <p><strong>Number of Directors:</strong> {selectedApplication.numberOfDirectors}</p>
-                  <p><strong>Estimated Turnover:</strong> ₹{selectedApplication.estimatedTurnover || 'Not specified'}</p>
-                </div>
-              </div>
-
-              {/* Additional Details */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Additional Details</h3>
-                <div className="space-y-2">
-                  <p><strong>GST Required:</strong> {selectedApplication.gstRequired}</p>
-                  <p><strong>Banking Partner:</strong> {selectedApplication.bankingPartner || 'Not specified'}</p>
+                  <p><strong>Business Place Proof:</strong> {selectedApplication.businessPlaceProof}</p>
+                  <p><strong>NOC from Owner:</strong> {selectedApplication.nocFromOwner || 'Not provided'}</p>
                 </div>
               </div>
             </div>
@@ -155,33 +170,29 @@ const StartupIncorporationManagement = () => {
             {/* Full Width Sections */}
             <div className="mt-6 space-y-4">
               <div>
-                <h3 className="text-lg font-semibold border-b pb-2 mb-3">Business Description</h3>
-                <p className="text-gray-700">{selectedApplication.businessDescription}</p>
+                <h3 className="text-lg font-semibold border-b pb-2 mb-3">Suggested Company Names</h3>
+                <p className="text-gray-700">{selectedApplication.companyNames}</p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold border-b pb-2 mb-3">Registered Address</h3>
-                <p className="text-gray-700">{selectedApplication.registeredAddress}</p>
+                <h3 className="text-lg font-semibold border-b pb-2 mb-3">Business Nature & Activities</h3>
+                <p className="text-gray-700">{selectedApplication.businessNature}</p>
               </div>
-
-              {selectedApplication.businessAddress && (
-                <div>
-                  <h3 className="text-lg font-semibold border-b pb-2 mb-3">Business Address</h3>
-                  <p className="text-gray-700">{selectedApplication.businessAddress}</p>
-                </div>
-              )}
 
               <div>
-                <h3 className="text-lg font-semibold border-b pb-2 mb-3">Director Details</h3>
-                <p className="text-gray-700">{selectedApplication.directorDetails}</p>
+                <h3 className="text-lg font-semibold border-b pb-2 mb-3">Company Address</h3>
+                <p className="text-gray-700">{selectedApplication.companyAddress}</p>
               </div>
 
-              {selectedApplication.additionalServices && (
-                <div>
-                  <h3 className="text-lg font-semibold border-b pb-2 mb-3">Additional Services</h3>
-                  <p className="text-gray-700">{selectedApplication.additionalServices}</p>
-                </div>
-              )}
+              <div>
+                <h3 className="text-lg font-semibold border-b pb-2 mb-3">Share Capital</h3>
+                <p className="text-gray-700">{selectedApplication.shareCapital}</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold border-b pb-2 mb-3">Share Breakup</h3>
+                <p className="text-gray-700">{selectedApplication.shareBreakup}</p>
+              </div>
             </div>
 
             {/* Action Buttons */}
@@ -250,7 +261,7 @@ const StartupIncorporationManagement = () => {
                       <div className="flex items-center space-x-3 mb-2">
                         <Building size={20} className="text-blue-600" />
                         <h3 className="text-lg font-semibold text-gray-800">
-                          {application.companyName}
+                          {application.studentName}
                         </h3>
                         <Badge className={getStatusColor(application.status)}>
                           {getStatusIcon(application.status)}
@@ -259,9 +270,9 @@ const StartupIncorporationManagement = () => {
                       </div>
                       
                       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-gray-600">
-                        <p><strong>Type:</strong> {application.businessType}</p>
-                        <p><strong>Industry:</strong> {application.industry}</p>
-                        <p><strong>Contact:</strong> {application.contactPerson}</p>
+                        <p><strong>Role:</strong> {application.roleNumber}</p>
+                        <p><strong>School:</strong> {application.schoolOfStudy}</p>
+                        <p><strong>Contact:</strong> {application.contactNumber}</p>
                         <p><strong>Submitted:</strong> {new Date(application.submittedAt).toLocaleDateString()}</p>
                       </div>
                     </div>

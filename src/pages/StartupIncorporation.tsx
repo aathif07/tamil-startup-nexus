@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Building, ArrowLeft, Send } from 'lucide-react';
@@ -13,26 +14,27 @@ const StartupIncorporation = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    companyName: '',
-    businessType: '',
-    industry: '',
-    founders: '',
-    registeredAddress: '',
-    businessAddress: '',
-    authorizedCapital: '',
-    paidUpCapital: '',
-    businessDescription: '',
-    numberOfDirectors: '',
-    directorDetails: '',
-    businessPlan: '',
-    estimatedTurnover: '',
-    bankingPartner: '',
-    gstRequired: 'yes',
-    additionalServices: '',
-    contactPerson: '',
-    phoneNumber: '',
-    email: '',
-    preferredCompletionDate: ''
+    studentName: '',
+    roleNumber: '',
+    schoolOfStudy: '',
+    contactNumber: '',
+    director1PanCard: '',
+    director2PanCard: '',
+    director1Identity: '',
+    director2Identity: '',
+    director1Mobile: '',
+    director1Email: '',
+    director2Mobile: '',
+    director2Email: '',
+    companyNames: '',
+    businessNature: '',
+    director1AddressProof: '',
+    director2AddressProof: '',
+    businessPlaceProof: '',
+    nocFromOwner: '',
+    shareCapital: '',
+    shareBreakup: '',
+    companyAddress: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,15 +51,8 @@ const StartupIncorporation = () => {
         applicationId,
         status: 'pending',
         submittedAt: serverTimestamp(),
-        estimatedCompletion: formData.preferredCompletionDate || 'TBD',
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-        // Convert string numbers to actual numbers for better querying
-        founders: formData.founders ? parseInt(formData.founders) : 0,
-        numberOfDirectors: formData.numberOfDirectors ? parseInt(formData.numberOfDirectors) : 0,
-        authorizedCapital: formData.authorizedCapital ? parseFloat(formData.authorizedCapital) : 0,
-        paidUpCapital: formData.paidUpCapital ? parseFloat(formData.paidUpCapital) : 0,
-        estimatedTurnover: formData.estimatedTurnover ? parseFloat(formData.estimatedTurnover) : 0,
       };
 
       console.log('Submitting to Firebase:', applicationData);
@@ -148,130 +143,64 @@ Our team will contact you within 24 hours to proceed with the incorporation proc
         >
           <Card className="shadow-2xl border-0">
             <CardHeader>
-              <CardTitle className="text-2xl text-center text-gray-800">Company Information</CardTitle>
+              <CardTitle className="text-2xl text-center text-gray-800">Application Details</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Company Basic Info */}
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Company Name *</label>
-                    <Input
-                      type="text"
-                      name="companyName"
-                      value={formData.companyName}
-                      onChange={handleChange}
-                      placeholder="Enter your company name"
-                      required
-                      disabled={loading}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Business Type *</label>
-                    <select
-                      name="businessType"
-                      value={formData.businessType}
-                      onChange={handleChange}
-                      required
-                      disabled={loading}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <option value="">Select business type</option>
-                      <option value="Private Limited">Private Limited Company</option>
-                      <option value="LLP">Limited Liability Partnership</option>
-                      <option value="Partnership">Partnership Firm</option>
-                      <option value="Sole Proprietorship">Sole Proprietorship</option>
-                      <option value="OPC">One Person Company</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Industry *</label>
-                    <Input
-                      type="text"
-                      name="industry"
-                      value={formData.industry}
-                      onChange={handleChange}
-                      placeholder="e.g., Technology, Healthcare, E-commerce"
-                      required
-                      disabled={loading}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Number of Founders *</label>
-                    <Input
-                      type="number"
-                      name="founders"
-                      value={formData.founders}
-                      onChange={handleChange}
-                      placeholder="Enter number of founders"
-                      required
-                      disabled={loading}
-                      min="1"
-                    />
-                  </div>
-                </div>
-
-                {/* Address Information */}
+                {/* Student Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Address Information</h3>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Registered Office Address *</label>
-                    <Textarea
-                      name="registeredAddress"
-                      value={formData.registeredAddress}
-                      onChange={handleChange}
-                      placeholder="Enter complete registered address"
-                      required
-                      disabled={loading}
-                      className="min-h-[80px]"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Business Address (if different)</label>
-                    <Textarea
-                      name="businessAddress"
-                      value={formData.businessAddress}
-                      onChange={handleChange}
-                      placeholder="Enter business address"
-                      disabled={loading}
-                      className="min-h-[80px]"
-                    />
-                  </div>
-                </div>
-
-                {/* Capital Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Capital Structure</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Student Information</h3>
                   
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Authorized Capital (₹) *</label>
+                      <label className="text-sm font-medium text-gray-700">Student Name *</label>
                       <Input
-                        type="number"
-                        name="authorizedCapital"
-                        value={formData.authorizedCapital}
+                        type="text"
+                        name="studentName"
+                        value={formData.studentName}
                         onChange={handleChange}
-                        placeholder="e.g., 100000"
+                        placeholder="Enter student name"
                         required
                         disabled={loading}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Paid-up Capital (₹) *</label>
+                      <label className="text-sm font-medium text-gray-700">Role Number *</label>
                       <Input
-                        type="number"
-                        name="paidUpCapital"
-                        value={formData.paidUpCapital}
+                        type="text"
+                        name="roleNumber"
+                        value={formData.roleNumber}
                         onChange={handleChange}
-                        placeholder="e.g., 50000"
+                        placeholder="Enter role number"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">School of Study *</label>
+                      <Input
+                        type="text"
+                        name="schoolOfStudy"
+                        value={formData.schoolOfStudy}
+                        onChange={handleChange}
+                        placeholder="Enter school of study"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Contact Number / Mobile Number *</label>
+                      <Input
+                        type="tel"
+                        name="contactNumber"
+                        value={formData.contactNumber}
+                        onChange={handleChange}
+                        placeholder="Enter contact number"
                         required
                         disabled={loading}
                       />
@@ -279,58 +208,191 @@ Our team will contact you within 24 hours to proceed with the incorporation proc
                   </div>
                 </div>
 
-                {/* Business Details */}
+                {/* Director 1 Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Business Details</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Director 1 Information</h3>
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">PAN CARD of Director 1 *</label>
+                      <Input
+                        type="text"
+                        name="director1PanCard"
+                        value={formData.director1PanCard}
+                        onChange={handleChange}
+                        placeholder="Enter PAN card details"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Aadhar card or Driving license of Director 1 *</label>
+                      <Input
+                        type="text"
+                        name="director1Identity"
+                        value={formData.director1Identity}
+                        onChange={handleChange}
+                        placeholder="Enter Aadhar or DL details"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Director 1 Mobile number *</label>
+                      <Input
+                        type="tel"
+                        name="director1Mobile"
+                        value={formData.director1Mobile}
+                        onChange={handleChange}
+                        placeholder="Enter mobile number"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Director 1 email id *</label>
+                      <Input
+                        type="email"
+                        name="director1Email"
+                        value={formData.director1Email}
+                        onChange={handleChange}
+                        placeholder="Enter email address"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Address Proof - Bank Statement or Electricity Bill (Latest Month) of Director 1 *</label>
+                    <Input
+                      type="text"
+                      name="director1AddressProof"
+                      value={formData.director1AddressProof}
+                      onChange={handleChange}
+                      placeholder="Enter address proof details"
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+
+                {/* Director 2 Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Director 2 Information</h3>
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">PAN CARD of Director 2 *</label>
+                      <Input
+                        type="text"
+                        name="director2PanCard"
+                        value={formData.director2PanCard}
+                        onChange={handleChange}
+                        placeholder="Enter PAN card details"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Aadhar card or Driving license of Director 2 *</label>
+                      <Input
+                        type="text"
+                        name="director2Identity"
+                        value={formData.director2Identity}
+                        onChange={handleChange}
+                        placeholder="Enter Aadhar or DL details"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Director 2 Mobile number *</label>
+                      <Input
+                        type="tel"
+                        name="director2Mobile"
+                        value={formData.director2Mobile}
+                        onChange={handleChange}
+                        placeholder="Enter mobile number"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Director 2 email id *</label>
+                      <Input
+                        type="email"
+                        name="director2Email"
+                        value={formData.director2Email}
+                        onChange={handleChange}
+                        placeholder="Enter email address"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Address Proof - Bank Statement or Electricity Bill (Latest Month) of Director 2 *</label>
+                    <Input
+                      type="text"
+                      name="director2AddressProof"
+                      value={formData.director2AddressProof}
+                      onChange={handleChange}
+                      placeholder="Enter address proof details"
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+
+                {/* Company Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Company Information</h3>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Business Description *</label>
+                    <label className="text-sm font-medium text-gray-700">Suggest three company names *</label>
                     <Textarea
-                      name="businessDescription"
-                      value={formData.businessDescription}
+                      name="companyNames"
+                      value={formData.companyNames}
                       onChange={handleChange}
-                      placeholder="Describe your business activities and objectives"
+                      placeholder="Example: ALE Private Limited, TEX Private Limited, BEN Technologies Private Limited"
+                      required
+                      disabled={loading}
+                      className="min-h-[80px]"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">NATURE BUSINESS WITH BRIEF ABOUT ACTIVITIES *</label>
+                    <Textarea
+                      name="businessNature"
+                      value={formData.businessNature}
+                      onChange={handleChange}
+                      placeholder="Describe your business nature and activities"
                       required
                       disabled={loading}
                       className="min-h-[120px]"
                     />
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Number of Directors *</label>
-                      <Input
-                        type="number"
-                        name="numberOfDirectors"
-                        value={formData.numberOfDirectors}
-                        onChange={handleChange}
-                        placeholder="Enter number of directors"
-                        required
-                        disabled={loading}
-                        min="1"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Estimated Annual Turnover (₹)</label>
-                      <Input
-                        type="number"
-                        name="estimatedTurnover"
-                        value={formData.estimatedTurnover}
-                        onChange={handleChange}
-                        placeholder="e.g., 1000000"
-                        disabled={loading}
-                      />
-                    </div>
-                  </div>
-
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Director Details *</label>
+                    <label className="text-sm font-medium text-gray-700">Full Address of the company *</label>
                     <Textarea
-                      name="directorDetails"
-                      value={formData.directorDetails}
+                      name="companyAddress"
+                      value={formData.companyAddress}
                       onChange={handleChange}
-                      placeholder="Provide names, PAN numbers, and Aadhaar numbers of all directors"
+                      placeholder="Enter complete company address"
                       required
                       disabled={loading}
                       className="min-h-[100px]"
@@ -338,106 +400,63 @@ Our team will contact you within 24 hours to proceed with the incorporation proc
                   </div>
                 </div>
 
-                {/* Additional Information */}
+                {/* Business Place and Documents */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Additional Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Business Place & Documents</h3>
                   
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Preferred Banking Partner</label>
-                      <Input
-                        type="text"
-                        name="bankingPartner"
-                        value={formData.bankingPartner}
-                        onChange={handleChange}
-                        placeholder="e.g., HDFC, ICICI, SBI"
-                        disabled={loading}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">GST Registration Required? *</label>
-                      <select
-                        name="gstRequired"
-                        value={formData.gstRequired}
-                        onChange={handleChange}
-                        required
-                        disabled={loading}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="later">Will apply later</option>
-                      </select>
-                    </div>
-                  </div>
-
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Preferred Completion Date</label>
+                    <label className="text-sm font-medium text-gray-700">Latest Electricity Bill (Less than 30 days) PROOF FOR PLACE OF BUSINESS *</label>
                     <Input
-                      type="date"
-                      name="preferredCompletionDate"
-                      value={formData.preferredCompletionDate}
+                      type="text"
+                      name="businessPlaceProof"
+                      value={formData.businessPlaceProof}
                       onChange={handleChange}
+                      placeholder="Enter electricity bill details"
+                      required
                       disabled={loading}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Additional Services Required</label>
-                    <Textarea
-                      name="additionalServices"
-                      value={formData.additionalServices}
+                    <label className="text-sm font-medium text-gray-700">NOC signed from the owner - Content will be given</label>
+                    <Input
+                      type="text"
+                      name="nocFromOwner"
+                      value={formData.nocFromOwner}
                       onChange={handleChange}
-                      placeholder="e.g., Trademark registration, Digital signature, Website development"
+                      placeholder="Enter NOC details"
                       disabled={loading}
-                      className="min-h-[80px]"
                     />
                   </div>
                 </div>
 
-                {/* Contact Information */}
+                {/* Capital and Share Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Contact Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Capital & Share Structure</h3>
                   
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Contact Person Name *</label>
-                      <Input
-                        type="text"
-                        name="contactPerson"
-                        value={formData.contactPerson}
-                        onChange={handleChange}
-                        placeholder="Enter contact person name"
-                        required
-                        disabled={loading}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Phone Number *</label>
-                      <Input
-                        type="tel"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
-                        onChange={handleChange}
-                        placeholder="Enter phone number"
-                        required
-                        disabled={loading}
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">SHARE CAPITAL - AUTHORIZED CAPITAL & PAID UP CAPITAL *</label>
+                    <Textarea
+                      name="shareCapital"
+                      value={formData.shareCapital}
+                      onChange={handleChange}
+                      placeholder="Minimum Rs 10,000/- to Maximum Rs 1,00,000/- amount to be paid in your company bank account after incorporation as your paid up capital."
+                      required
+                      disabled={loading}
+                      className="min-h-[80px]"
+                    />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Email Address *</label>
-                    <Input
-                      type="email"
-                      name="email"
-                      value={formData.email}
+                    <label className="text-sm font-medium text-gray-700">SHARE BREAKUP OF DIRECTORS AND SHARE HOLDERS *</label>
+                    <Textarea
+                      name="shareBreakup"
+                      value={formData.shareBreakup}
                       onChange={handleChange}
-                      placeholder="Enter email address"
+                      placeholder="Example: Director 1- 51%, Director 2-49%"
                       required
                       disabled={loading}
+                      className="min-h-[80px]"
                     />
                   </div>
                 </div>
