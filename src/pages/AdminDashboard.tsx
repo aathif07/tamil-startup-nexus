@@ -1,19 +1,193 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Settings, BarChart3, FileText, LogOut, Menu, X, Building } from 'lucide-react';
+import { 
+  Users, 
+  Building, 
+  TrendingUp, 
+  Calendar,
+  Eye,
+  Download,
+  Filter,
+  Search,
+  RefreshCw,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Phone,
+  Mail,
+  MapPin,
+  IndianRupee,
+  Home,
+  FileText,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  BarChart3,
+  UserCheck,
+  Bell
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import UserManagement from '@/components/dashboard/UserManagement';
-import AdminStats from '@/components/dashboard/AdminStats';
-import CertificationManagement from '@/components/dashboard/CertificationManagement';
-import StartupIncorporationManagement from '@/components/dashboard/StartupIncorporationManagement';
+import { collection, getDocs, query, orderBy, updateDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+
+interface IncorporationApplication {
+  id: string;
+  applicationId: string;
+  companyName: string;
+  businessType: string;
+  industry: string;
+  founders: number;
+  registeredAddress: string;
+  businessAddress: string;
+  authorizedCapital: number;
+  paidUpCapital: number;
+  businessDescription: string;
+  numberOfDirectors: number;
+  directorDetails: string;
+  estimatedTurnover: number;
+  bankingPartner: string;
+  gstRequired: string;
+  additionalServices: string;
+  contactPerson: string;
+  phoneNumber: string;
+  email: string;
+  preferredCompletionDate: string;
+  status: 'pending' | 'approved' | 'rejected' | 'in-progress' | 'completed';
+  submittedAt: any;
+  createdAt: any;
+  updatedAt: any;
+}
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const [applications, setApplications] = useState<IncorporationApplication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedApplication, setSelectedApplication] = useState<IncorporationApplication | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
+
+  // Sidebar menu items
+  const sidebarItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: Home },
+    { id: 'applications', label: 'Applications', icon: FileText },
+    { id: 'users', label: 'Users', icon: Users },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ];
+
+  // Fetch applications from Firebase
+  const fetchApplications = async () => {
+    setLoading(true);
+    try {
+      const q = query(
+        collection(db, 'incorporationApplications'),
+        orderBy('submittedAt', 'desc')
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const applicationsData: IncorporationApplication[] = [];
+      
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        applicationsData.push({
+          id: doc.id,
+          ...data,
+          submittedAt: data.submittedAt?.toDate?.() || new Date(),
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          updatedAt: data.updatedAt?.toDate?.() || new Date(),
+        } as IncorporationApplication);
+      });
+      
+      setApplications(applicationsData);
+      console.log('Fetched applications:', applicationsData);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      alert('Error fetching applications. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update application status
+  const updateApplicationStatus = async (applicationId: string, newStatus: string) => {
+    try {
+      const applicationRef = doc(db, 'incorporationApplications', applicationId);
+      await updateDoc(applicationRef, {
+        status: newStatus,
+        updatedAt: new Date()
+      });
+      
+      setApplications(prev => 
+        prev.map(app => 
+          app.id === applicationId 
+            ? { ...app, status: newStatus as any, updatedAt: new Date() }
+            : app
+        )
+      );
+      
+      alert(`Application status updated to ${newStatus}`);
+    } catch (error) {
+      console.error('Error updating status:', error);
+      alert('Error updating application status');
+    }
+  };
+
+  useEffect(() => {
+    const userRole = localStorage.getItem('userRole');
+    if (userRole !== 'admin') {
+      navigate('/login');
+      return;
+    }
+    
+    fetchApplications();
+  }, [navigate]);
+
+  // Filter applications
+  const filteredApplications = applications.filter(app => {
+    const matchesSearch = 
+      app.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.applicationId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.contactPerson.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
+
+  // Get status display
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return { color: 'text-yellow-600 bg-yellow-100', icon: Clock, text: 'Pending' };
+      case 'approved':
+        return { color: 'text-green-600 bg-green-100', icon: CheckCircle, text: 'Approved' };
+      case 'rejected':
+        return { color: 'text-red-600 bg-red-100', icon: XCircle, text: 'Rejected' };
+      case 'in-progress':
+        return { color: 'text-blue-600 bg-blue-100', icon: RefreshCw, text: 'In Progress' };
+      case 'completed':
+        return { color: 'text-purple-600 bg-purple-100', icon: CheckCircle, text: 'Completed' };
+      default:
+        return { color: 'text-gray-600 bg-gray-100', icon: Clock, text: 'Unknown' };
+    }
+  };
+
+  // Calculate statistics
+  const stats = {
+    total: applications.length,
+    pending: applications.filter(app => app.status === 'pending').length,
+    approved: applications.filter(app => app.status === 'approved').length,
+    completed: applications.filter(app => app.status === 'completed').length,
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('userRole');
@@ -21,141 +195,690 @@ const AdminDashboard = () => {
     navigate('/login');
   };
 
-  const menuItems = [
-    { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'users', label: 'User Management', icon: Users },
-    { id: 'certifications', label: 'Certifications', icon: FileText },
-    { id: 'startup-incorporation', label: 'Startup Incorporation', icon: Building },
-    { id: 'settings', label: 'Settings', icon: Settings },
-  ];
-
+  // Render different content based on active tab
   const renderContent = () => {
     switch (activeTab) {
-      case 'overview':
-        return <AdminStats />;
+      case 'dashboard':
+      case 'applications':
+        return renderApplicationsContent();
       case 'users':
-        return <UserManagement />;
-      case 'certifications':
-        return <CertificationManagement />;
-      case 'startup-incorporation':
-        return <StartupIncorporationManagement />;
+        return renderUsersContent();
+      case 'analytics':
+        return renderAnalyticsContent();
+      case 'notifications':
+        return renderNotificationsContent();
       case 'settings':
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Admin Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Admin settings and configuration options coming soon...</p>
-            </CardContent>
-          </Card>
-        );
+        return renderSettingsContent();
       default:
-        return <AdminStats />;
+        return renderApplicationsContent();
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
-      {/* Sidebar */}
-      <motion.div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-        initial={{ x: -250 }}
-        animate={{ x: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex items-center justify-between p-4 lg:p-6 border-b">
-          <div className="flex items-center space-x-2 lg:space-x-3">
-            <div className="w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-red-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs lg:text-sm">SD</span>
+  const renderApplicationsContent = () => (
+    <>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Applications</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+                </div>
+                <Building className="h-8 w-8 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Pending</p>
+                  <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
+                </div>
+                <Clock className="h-8 w-8 text-yellow-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Approved</p>
+                  <p className="text-3xl font-bold text-green-600">{stats.approved}</p>
+                </div>
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Completed</p>
+                  <p className="text-3xl font-bold text-purple-600">{stats.completed}</p>
+                </div>
+                <CheckCircle className="h-8 w-8 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Filters and Search */}
+      <Card className="mb-6">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Input
+                  placeholder="Search by company name, application ID, contact person, or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
-            <h1 className="text-base lg:text-lg font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
-              Admin Panel
-            </h1>
+            <div className="md:w-48">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
           </div>
-          <button
+        </CardContent>
+      </Card>
+
+      {/* Applications Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Incorporation Applications ({filteredApplications.length})</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="text-center py-8">
+              <RefreshCw className="animate-spin mx-auto mb-4" size={32} />
+              <p>Loading applications...</p>
+            </div>
+          ) : filteredApplications.length === 0 ? (
+            <div className="text-center py-8">
+              <Building className="mx-auto mb-4 text-gray-400" size={48} />
+              <p className="text-gray-600">No applications found</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Application ID</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Company Name</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Contact Person</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Business Type</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Status</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Submitted</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredApplications.map((app) => {
+                    const statusDisplay = getStatusDisplay(app.status);
+                    const StatusIcon = statusDisplay.icon;
+                    
+                    return (
+                      <tr key={app.id} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-4">
+                          <span className="font-mono text-sm">{app.applicationId}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div>
+                            <p className="font-medium">{app.companyName}</p>
+                            <p className="text-sm text-gray-600">{app.industry}</p>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div>
+                            <p className="font-medium">{app.contactPerson}</p>
+                            <p className="text-sm text-gray-600">{app.email}</p>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="text-sm">{app.businessType}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${statusDisplay.color}`}>
+                            <StatusIcon size={12} className="mr-1" />
+                            {statusDisplay.text}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="text-sm text-gray-600">
+                            {new Date(app.submittedAt).toLocaleDateString()}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setSelectedApplication(app);
+                                setShowModal(true);
+                              }}
+                            >
+                              <Eye size={14} className="mr-1" />
+                              View
+                            </Button>
+                            <select
+                              value={app.status}
+                              onChange={(e) => updateApplicationStatus(app.id, e.target.value)}
+                              className="text-xs border rounded px-2 py-1"
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="approved">Approved</option>
+                              <option value="in-progress">In Progress</option>
+                              <option value="completed">Completed</option>
+                              <option value="rejected">Rejected</option>
+                            </select>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
+
+  const renderUsersContent = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle>User Management</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-center py-8">
+          <Users className="mx-auto mb-4 text-gray-400" size={48} />
+          <p className="text-gray-600">User management feature coming soon!</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderAnalyticsContent = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle>Analytics & Reports</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-center py-8">
+          <BarChart3 className="mx-auto mb-4 text-gray-400" size={48} />
+          <p className="text-gray-600">Analytics dashboard coming soon!</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderNotificationsContent = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle>Notifications</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-center py-8">
+          <Bell className="mx-auto mb-4 text-gray-400" size={48} />
+          <p className="text-gray-600">Notification center coming soon!</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderSettingsContent = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle>Settings</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-center py-8">
+          <Settings className="mx-auto mb-4 text-gray-400" size={48} />
+          <p className="text-gray-600">Settings panel coming soon!</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-red-50 flex">
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
+        <div className="flex items-center justify-between h-16 px-6 border-b">
+          <div className="flex items-center">
+            <Building className="h-8 w-8 text-blue-600 mr-2" />
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
+              Admin Panel
+            </span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-1 rounded-md hover:bg-gray-100"
+            className="lg:hidden"
           >
-            <X size={18} />
-          </button>
+            <X size={20} />
+          </Button>
         </div>
 
-        <nav className="mt-4 lg:mt-6">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                setActiveTab(item.id);
-                setSidebarOpen(false);
-              }}
-              className={`w-full flex items-center space-x-3 px-4 lg:px-6 py-3 text-left transition-colors ${
-                activeTab === item.id
-                  ? 'bg-red-50 text-red-600 border-r-2 border-red-600'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <item.icon size={18} />
-              <span className="text-sm lg:text-base">{item.label}</span>
-            </button>
-          ))}
+        <nav className="mt-6">
+          <div className="px-6 mb-4">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Main Navigation
+            </p>
+          </div>
+          
+          {sidebarItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setSidebarOpen(false);
+                }}
+                className={`w-full flex items-center px-6 py-3 text-left hover:bg-gray-50 transition-colors ${
+                  isActive 
+                    ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Icon size={20} className="mr-3" />
+                <span className="font-medium">{item.label}</span>
+                {item.id === 'applications' && stats.pending > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                    {stats.pending}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </nav>
 
-        <div className="absolute bottom-4 lg:bottom-6 left-4 lg:left-6 right-4 lg:right-6">
+        <div className="absolute bottom-0 w-full p-6 border-t">
           <Button
             onClick={handleLogout}
             variant="outline"
-            className="w-full flex items-center space-x-2 text-sm"
-            size="sm"
+            className="w-full flex items-center justify-center"
           >
-            <LogOut size={14} />
-            <span>Logout</span>
+            <LogOut size={16} className="mr-2" />
+            Logout
           </Button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Overlay for mobile */}
       {sidebarOpen && (
-        <div
+        <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white shadow-sm border-b px-4 lg:px-6 py-3 lg:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3 lg:space-x-4">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-md hover:bg-gray-100"
-              >
-                <Menu size={18} />
-              </button>
-              <h2 className="text-lg lg:text-2xl font-bold text-gray-800 truncate">
-                {menuItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
-              </h2>
-            </div>
-            <div className="flex items-center space-x-2 lg:space-x-4">
-              <span className="text-xs lg:text-sm text-gray-600 hidden sm:inline">Welcome, Admin</span>
-              <div className="w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-red-500 to-blue-600 rounded-full"></div>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="px-6 py-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSidebarOpen(true)}
+                  className="lg:hidden mr-4"
+                >
+                  <Menu size={20} />
+                </Button>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-800 capitalize">
+                    {activeTab === 'dashboard' ? 'Dashboard' : activeTab}
+                  </h1>
+                  <p className="text-gray-600">
+                    {activeTab === 'dashboard' || activeTab === 'applications' 
+                      ? 'Manage startup incorporation applications'
+                      : `Manage ${activeTab}`
+                    }
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Button
+                  onClick={fetchApplications}
+                  variant="outline"
+                  size="sm"
+                  disabled={loading}
+                >
+                  <RefreshCw size={16} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+                <div className="relative">
+                  <Bell className="h-6 w-6 text-gray-600" />
+                  {stats.pending > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {stats.pending}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-        </header>
+        </div>
 
-        <main className="flex-1 p-4 lg:p-6 overflow-auto">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {renderContent()}
-          </motion.div>
-        </main>
+        {/* Content Area */}
+        <div className="flex-1 overflow-auto p-6">
+          {renderContent()}
+        </div>
       </div>
+
+      {/* Application Details Modal */}
+      {showModal && selectedApplication && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Application Details</h2>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowModal(false)}
+                >
+                  Close
+                </Button>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Basic Information</h3>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Application ID</label>
+                      <p className="font-mono text-sm bg-gray-100 p-2 rounded">{selectedApplication.applicationId}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Company Name</label>
+                      <p className="text-sm">{selectedApplication.companyName}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Business Type</label>
+                      <p className="text-sm">{selectedApplication.businessType}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Industry</label>
+                      <p className="text-sm">{selectedApplication.industry}</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Founders</label>
+                        <p className="text-sm">{selectedApplication.founders}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Directors</label>
+                        <p className="text-sm">{selectedApplication.numberOfDirectors}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Contact Information</h3>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Users size={16} className="text-gray-600" />
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Contact Person</label>
+                        <p className="text-sm">{selectedApplication.contactPerson}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Mail size={16} className="text-gray-600" />
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Email</label>
+                        <p className="text-sm">{selectedApplication.email}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Phone size={16} className="text-gray-600" />
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Phone</label>
+                        <p className="text-sm">{selectedApplication.phoneNumber}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Address Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Address Information</h3>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Registered Address</label>
+                      <p className="text-sm bg-gray-50 p-2 rounded">{selectedApplication.registeredAddress}</p>
+                    </div>
+                    
+                    {selectedApplication.businessAddress && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Business Address</label>
+                        <p className="text-sm bg-gray-50 p-2 rounded">{selectedApplication.businessAddress}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Capital Structure */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Capital Structure</h3>
+                  
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center space-x-2">
+                        <IndianRupee size={16} className="text-gray-600" />
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Authorized Capital</label>
+                          <p className="text-sm">₹{selectedApplication.authorizedCapital?.toLocaleString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <IndianRupee size={16} className="text-gray-600" />
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Paid-up Capital</label>
+                          <p className="text-sm">₹{selectedApplication.paidUpCapital?.toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {selectedApplication.estimatedTurnover > 0 && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Estimated Annual Turnover</label>
+                        <p className="text-sm">₹{selectedApplication.estimatedTurnover?.toLocaleString()}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Business Description */}
+                <div className="md:col-span-2 space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Business Details</h3>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Business Description</label>
+                      <p className="text-sm bg-gray-50 p-3 rounded">{selectedApplication.businessDescription}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Director Details</label>
+                      <p className="text-sm bg-gray-50 p-3 rounded whitespace-pre-wrap">{selectedApplication.directorDetails}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Information */}
+                <div className="md:col-span-2 space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Additional Information</h3>
+                  
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">GST Required</label>
+                      <p className="text-sm capitalize">{selectedApplication.gstRequired}</p>
+                    </div>
+                    
+                    {selectedApplication.bankingPartner && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Banking Partner</label>
+                        <p className="text-sm">{selectedApplication.bankingPartner}</p>
+                      </div>
+                    )}
+                    
+                    {selectedApplication.preferredCompletionDate && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Preferred Completion</label>
+                        <p className="text-sm">{new Date(selectedApplication.preferredCompletionDate).toLocaleDateString()}</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {selectedApplication.additionalServices && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Additional Services</label>
+                      <p className="text-sm bg-gray-50 p-3 rounded">{selectedApplication.additionalServices}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Status and Timestamps */}
+                <div className="md:col-span-2 space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Application Status</h3>
+                  
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Current Status</label>
+                      <div className="mt-1">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusDisplay(selectedApplication.status).color}`}>
+                          {getStatusDisplay(selectedApplication.status).text}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Submitted At</label>
+                      <p className="text-sm">{new Date(selectedApplication.submittedAt).toLocaleString()}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Last Updated</label>
+                      <p className="text-sm">{new Date(selectedApplication.updatedAt).toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-6 flex justify-between items-center pt-6 border-t">
+                <div className="flex space-x-2">
+                  <Button
+                    onClick={() => updateApplicationStatus(selectedApplication.id, 'approved')}
+                    className="bg-green-600 hover:bg-green-700"
+                    disabled={selectedApplication.status === 'approved'}
+                  >
+                    <CheckCircle size={16} className="mr-2" />
+                    Approve
+                  </Button>
+                  <Button
+                    onClick={() => updateApplicationStatus(selectedApplication.id, 'in-progress')}
+                    className="bg-blue-600 hover:bg-blue-700"
+                    disabled={selectedApplication.status === 'in-progress'}
+                  >
+                    <RefreshCw size={16} className="mr-2" />
+                    Mark In Progress
+                  </Button>
+                  <Button
+                    onClick={() => updateApplicationStatus(selectedApplication.id, 'completed')}
+                    className="bg-purple-600 hover:bg-purple-700"
+                    disabled={selectedApplication.status === 'completed'}
+                  >
+                    <CheckCircle size={16} className="mr-2" />
+                    Mark Completed
+                  </Button>
+                  <Button
+                    onClick={() => updateApplicationStatus(selectedApplication.id, 'rejected')}
+                    variant="destructive"
+                    disabled={selectedApplication.status === 'rejected'}
+                  >
+                    <XCircle size={16} className="mr-2" />
+                    Reject
+                  </Button>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setShowModal(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

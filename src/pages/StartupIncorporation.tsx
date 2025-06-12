@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Building, ArrowLeft, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const StartupIncorporation = () => {
   const navigate = useNavigate();
@@ -39,31 +40,62 @@ const StartupIncorporation = () => {
     setLoading(true);
 
     try {
-      // Get current user info
-      const userId = localStorage.getItem('userId');
-      const userEmail = localStorage.getItem('userEmail');
-
-      // Create incorporation application object
+      // Generate application ID
+      const applicationId = `INC-${Date.now()}`;
+      
+      // Create incorporation application object for Firebase
       const applicationData = {
         ...formData,
-        userId,
-        userEmail,
-        applicationId: `INC-${Date.now()}`,
+        applicationId,
         status: 'pending',
-        submittedAt: new Date().toISOString(),
-        estimatedCompletion: formData.preferredCompletionDate || 'TBD'
+        submittedAt: serverTimestamp(),
+        estimatedCompletion: formData.preferredCompletionDate || 'TBD',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        // Convert string numbers to actual numbers for better querying
+        founders: formData.founders ? parseInt(formData.founders) : 0,
+        numberOfDirectors: formData.numberOfDirectors ? parseInt(formData.numberOfDirectors) : 0,
+        authorizedCapital: formData.authorizedCapital ? parseFloat(formData.authorizedCapital) : 0,
+        paidUpCapital: formData.paidUpCapital ? parseFloat(formData.paidUpCapital) : 0,
+        estimatedTurnover: formData.estimatedTurnover ? parseFloat(formData.estimatedTurnover) : 0,
       };
 
-      // Store in localStorage (in real app, this would be sent to backend)
-      const existingApplications = JSON.parse(localStorage.getItem('incorporationApplications') || '[]');
-      existingApplications.push(applicationData);
-      localStorage.setItem('incorporationApplications', JSON.stringify(existingApplications));
+      console.log('Submitting to Firebase:', applicationData);
 
-      alert('Your startup incorporation application has been submitted successfully! Our team will contact you within 24 hours.');
-      navigate('/user-dashboard');
+      // Add document to Firebase Firestore
+      const docRef = await addDoc(collection(db, 'incorporationApplications'), applicationData);
+      
+      console.log('Document written with ID: ', docRef.id);
+
+      // Show success message with application ID
+      alert(`Your startup incorporation application has been submitted successfully!
+
+Application ID: ${applicationId}
+Document ID: ${docRef.id}
+
+Our team will contact you within 24 hours to proceed with the incorporation process.`);
+      
+      // Navigate back to home page
+      navigate('/');
+      
     } catch (error) {
-      console.error('Error submitting application:', error);
-      alert('There was an error submitting your application. Please try again.');
+      console.error('Error adding document: ', error);
+      
+      // More specific error handling
+      let errorMessage = 'There was an error submitting your application. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('permission-denied')) {
+          errorMessage = 'Permission denied. Please check your Firebase security rules.';
+        } else if (error.message.includes('network')) {
+          errorMessage = 'Network error. Please check your internet connection and try again.';
+        } else if (error.message.includes('unavailable')) {
+          errorMessage = 'Service temporarily unavailable. Please try again in a few moments.';
+        }
+        console.error('Detailed error:', error.message);
+      }
+      
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -88,11 +120,11 @@ const StartupIncorporation = () => {
         >
           <Button 
             variant="ghost" 
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/')}
             className="mb-4 text-gray-600 hover:text-gray-800"
           >
             <ArrowLeft size={20} className="mr-2" />
-            Back
+            Back to Home
           </Button>
           
           <div className="text-center">

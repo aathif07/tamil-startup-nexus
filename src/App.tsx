@@ -25,14 +25,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route 
-            path="/startup-incorporation" 
-            element={
-              <ProtectedRoute>
-                <StartupIncorporation />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/startup-incorporation" element={<StartupIncorporation />} />
+  
           <Route 
             path="/admin-dashboard" 
             element={
