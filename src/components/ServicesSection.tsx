@@ -2,8 +2,21 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Zap, DollarSign, Calendar, Lightbulb, FileText, Building, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const ServicesSection = () => {
+  const navigate = useNavigate();
+
+  const handleStartupIncorporationClick = () => {
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      navigate('/startup-incorporation');
+    }
+  };
+
   const services = [
     {
       icon: Building,
@@ -11,7 +24,8 @@ const ServicesSection = () => {
       description: 'Complete startup incorporation services including company registration, legal documentation, and compliance setup.',
       price: '₹10,000',
       color: 'from-red-500 to-pink-500',
-      features: ['Company Registration', 'Legal Documentation', 'Compliance Setup', 'Tax Registration']
+      features: ['Company Registration', 'Legal Documentation', 'Compliance Setup', 'Tax Registration'],
+      isSpecial: true
     },
     {
       icon: Globe,
@@ -84,12 +98,9 @@ const ServicesSection = () => {
               viewport={{ once: true }}
               whileHover={{ y: -10 }}
             >
-              {/* Glassmorphism Card */}
               <div className="relative h-full bg-white/70 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
-                {/* Gradient Background on Hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-300`} />
                 
-                {/* Icon */}
                 <motion.div
                   className={`w-16 h-16 bg-gradient-to-br ${service.color} rounded-xl flex items-center justify-center mb-6 relative z-10`}
                   whileHover={{ scale: 1.1, rotate: 5 }}
@@ -98,7 +109,6 @@ const ServicesSection = () => {
                   <service.icon size={32} className="text-white" />
                 </motion.div>
                 
-                {/* Content */}
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-xl font-semibold text-gray-800 group-hover:text-gray-900 transition-colors">
@@ -113,7 +123,6 @@ const ServicesSection = () => {
                     {service.description}
                   </p>
 
-                  {/* Features List */}
                   <ul className="space-y-2 mb-6">
                     {service.features.map((feature, idx) => (
                       <li key={idx} className="flex items-center text-sm text-gray-600">
@@ -123,28 +132,26 @@ const ServicesSection = () => {
                     ))}
                   </ul>
 
-                  {/* CTA Button */}
                   <Button 
                     className={`w-full bg-gradient-to-r ${service.color} text-white hover:opacity-90 transition-opacity`}
                     size="sm"
+                    onClick={service.isSpecial ? handleStartupIncorporationClick : undefined}
                   >
                     {service.price === 'Get Quote' ? 'Get Your Price' : 
                      service.price === 'Free Consultation' ? 'Book Consultation' : 
+                     service.isSpecial ? 'Apply Now' :
                      'Learn More'}
                   </Button>
                 </div>
                 
-                {/* Hover Effect Overlay */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               
-              {/* 3D Shadow Effect */}
               <div className={`absolute inset-0 bg-gradient-to-br ${service.color} rounded-2xl opacity-20 blur-xl transform translate-y-4 group-hover:translate-y-6 transition-transform duration-300`} />
             </motion.div>
           ))}
         </div>
 
-        {/* Special Offers Section */}
         <motion.div
           className="mt-16 text-center"
           initial={{ opacity: 0, y: 30 }}

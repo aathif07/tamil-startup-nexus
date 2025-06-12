@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Settings, BarChart3, FileText, LogOut, Menu, X } from 'lucide-react';
+import { Users, Settings, BarChart3, FileText, LogOut, Menu, X, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import UserManagement from '@/components/dashboard/UserManagement';
 import AdminStats from '@/components/dashboard/AdminStats';
 import CertificationManagement from '@/components/dashboard/CertificationManagement';
+import StartupIncorporationManagement from '@/components/dashboard/StartupIncorporationManagement';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -24,6 +25,7 @@ const AdminDashboard = () => {
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'User Management', icon: Users },
     { id: 'certifications', label: 'Certifications', icon: FileText },
+    { id: 'startup-incorporation', label: 'Startup Incorporation', icon: Building },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -35,6 +37,8 @@ const AdminDashboard = () => {
         return <UserManagement />;
       case 'certifications':
         return <CertificationManagement />;
+      case 'startup-incorporation':
+        return <StartupIncorporationManagement />;
       case 'settings':
         return (
           <Card>
@@ -120,9 +124,7 @@ const AdminDashboard = () => {
         />
       )}
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Header */}
         <header className="bg-white shadow-sm border-b px-4 lg:px-6 py-3 lg:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 lg:space-x-4">
@@ -143,7 +145,6 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        {/* Main Content Area */}
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
           <motion.div
             key={activeTab}
