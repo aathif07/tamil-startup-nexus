@@ -31,7 +31,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs, query, orderBy, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 interface IncorporationApplication {
@@ -66,6 +66,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [applications, setApplications] = useState<IncorporationApplication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedApplication, setSelectedApplication] = useState<IncorporationApplication | null>(null);
@@ -86,57 +87,164 @@ const AdminDashboard = () => {
   // Fetch applications from Firebase
   const fetchApplications = async () => {
     setLoading(true);
+    setError(null);
+    
     try {
-      const q = query(
-        collection(db, 'incorporationApplications'),
-        orderBy('submittedAt', 'desc')
-      );
+      console.log('Starting to fetch applications from Firebase...');
+      
+      const applicationsRef = collection(db, 'incorporationApplications');
+      console.log('Collection reference created');
+      
+      const q = query(applicationsRef, orderBy('submittedAt', 'desc'));
+      console.log('Query created');
       
       const querySnapshot = await getDocs(q);
-      const applicationsData: IncorporationApplication[] = [];
+      console.log('Query executed, snapshot received:', querySnapshot);
+      console.log('Number of documents:', querySnapshot.size);
+      
+      const fetchedApplications: IncorporationApplication[] = [];
       
       querySnapshot.forEach((doc) => {
+        console.log('Processing document:', doc.id, doc.data());
         const data = doc.data();
-        applicationsData.push({
+        
+        fetchedApplications.push({
           id: doc.id,
-          ...data,
-          submittedAt: data.submittedAt?.toDate?.() || new Date(),
-          createdAt: data.createdAt?.toDate?.() || new Date(),
-          updatedAt: data.updatedAt?.toDate?.() || new Date(),
-        } as IncorporationApplication);
+          applicationId: data.applicationId || doc.id,
+          
+          // Handle both old and new data formats
+          companyName: data.companyName || 
+                       (data.companyNames ? data.companyNames.split(',')[0]?.trim() : '') || 
+                       'Company Name Not Provided',
+          
+          businessType: data.businessType || 'Private Limited Company',
+          
+          industry: data.industry || 
+                    data.businessNature || 
+                    'Industry Not Specified',
+          
+          contactPerson: data.contactPerson || 
+                         data.studentName || 
+                         'Contact Person Not Provided',
+          
+          email: data.email || 
+                 data.director1Email || 
+                 data.userEmail || 
+                 'Email Not Provided',
+          
+          phoneNumber: data.phoneNumber || 
+                       data.director1Mobile || 
+                       data.contactNumber || 
+                       'Phone Not Provided',
+          
+          // Rest of the fields
+          founders: parseInt(data.founders?.toString() || '2') || 2,
+          registeredAddress: data.registeredAddress || 
+                            data.companyAddress || 
+                            'Address Not Provided',
+          businessAddress: data.businessAddress || data.companyAddress || '',
+          authorizedCapital: parseInt(data.authorizedCapital?.toString() || data.shareCapital?.toString() || '100000') || 100000,
+          paidUpCapital: parseInt(data.paidUpCapital?.toString() || data.shareCapital?.toString() || '50000') || 50000,
+          businessDescription: data.businessDescription || 
+                              data.businessNature || 
+                              'Business Description Not Provided',
+          numberOfDirectors: parseInt(data.numberOfDirectors?.toString() || '2') || 2,
+          directorDetails: data.directorDetails || 
+                          `Director 1: ${data.director1PanCard || 'N/A'}, Director 2: ${data.director2PanCard || 'N/A'}`,
+          estimatedTurnover: parseInt(data.estimatedTurnover?.toString() || '0') || 0,
+          bankingPartner: data.bankingPartner || 'Not specified',
+          gstRequired: data.gstRequired || 'yes',
+          additionalServices: data.additionalServices || 'None',
+          preferredCompletionDate: data.preferredCompletionDate || '',
+          status: data.status || 'pending',
+          submittedAt: data.submittedAt || new Date().toISOString(),
+          createdAt: data.createdAt || new Date().toISOString(),
+          updatedAt: data.updatedAt || new Date().toISOString(),
+          userId: data.userId || '',
+          userName: data.userName || data.studentName || '',
+          userEmail: data.userEmail || data.director1Email || ''
+        });
       });
       
-      setApplications(applicationsData);
-      console.log('Fetched applications:', applicationsData);
+      console.log('Final fetched applications:', fetchedApplications);
+      setApplications(fetchedApplications);
+      
+      if (fetchedApplications.length === 0) {
+        console.log('No applications found in database');
+      }
+      
     } catch (error) {
-      console.error('Error fetching applications:', error);
-      alert('Error fetching applications. Please try again.');
+      console.error('Detailed error fetching applications:', error);
+      setError(`Failed to load applications: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setApplications([]);
     } finally {
       setLoading(false);
+      console.log('Fetch process completed');
     }
   };
 
   // Update application status
   const updateApplicationStatus = async (applicationId: string, newStatus: string) => {
     try {
-      const applicationRef = doc(db, 'incorporationApplications', applicationId);
-      await updateDoc(applicationRef, {
+      console.log(`Updating application ${applicationId} to status: ${newStatus}`);
+      
+      // Find the application document
+      const application = applications.find(app => app.applicationId === applicationId || app.id === applicationId);
+      if (!application) {
+        alert('Application not found');
+        return;
+      }
+      
+      // Update in Firebase
+      const docRef = doc(db, 'incorporationApplications', application.id);
+      await updateDoc(docRef, {
         status: newStatus,
-        updatedAt: new Date()
+        updatedAt: new Date().toISOString()
       });
       
+      // Update local state
       setApplications(prev => 
         prev.map(app => 
-          app.id === applicationId 
-            ? { ...app, status: newStatus as any, updatedAt: new Date() }
+          (app.applicationId === applicationId || app.id === applicationId)
+            ? { ...app, status: newStatus as any, updatedAt: new Date().toISOString() }
             : app
         )
       );
       
       alert(`Application status updated to ${newStatus}`);
     } catch (error) {
-      console.error('Error updating status:', error);
+      console.error('Error updating status in Firebase:', error);
       alert('Error updating application status');
+    }
+  };
+
+  // Delete application
+  const deleteApplication = async (applicationId: string, companyName: string) => {
+    if (!confirm(`Are you sure you want to delete the application for "${companyName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      console.log(`Deleting application ${applicationId}`);
+      
+      // Find the application document
+      const application = applications.find(app => app.applicationId === applicationId || app.id === applicationId);
+      if (!application) {
+        alert('Application not found');
+        return;
+      }
+      
+      // Delete from Firebase
+      const docRef = doc(db, 'incorporationApplications', application.id);
+      await deleteDoc(docRef);
+      
+      // Remove from local state
+      setApplications(prev => prev.filter(app => app.applicationId !== applicationId && app.id !== applicationId));
+      
+      alert('Application deleted successfully');
+    } catch (error) {
+      console.error('Error deleting application from Firebase:', error);
+      alert('Error deleting application');
     }
   };
 
@@ -153,10 +261,10 @@ const AdminDashboard = () => {
   // Filter applications
   const filteredApplications = applications.filter(app => {
     const matchesSearch = 
-      app.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.applicationId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.contactPerson.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.email.toLowerCase().includes(searchTerm.toLowerCase());
+      (app.companyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (app.applicationId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (app.contactPerson || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (app.email || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
     
@@ -291,6 +399,29 @@ const AdminDashboard = () => {
         </motion.div>
       </div>
 
+      {/* ADD ERROR DISPLAY */}
+      {error && (
+        <Card className="mb-6 border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-center text-red-800">
+              <XCircle className="h-5 w-5 mr-2" />
+              <span>{error}</span>
+              <Button 
+                onClick={() => {
+                  setError(null);
+                  fetchApplications();
+                }}
+                variant="outline" 
+                size="sm" 
+                className="ml-auto"
+              >
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Filters and Search */}
       <Card className="mb-6">
         <CardContent className="p-6">
@@ -337,10 +468,25 @@ const AdminDashboard = () => {
               <RefreshCw className="animate-spin mx-auto mb-4" size={32} />
               <p>Loading applications...</p>
             </div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <XCircle className="mx-auto mb-4 text-red-500" size={48} />
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button onClick={fetchApplications} variant="outline">
+                Try Again
+              </Button>
+            </div>
           ) : filteredApplications.length === 0 ? (
             <div className="text-center py-8">
               <Building className="mx-auto mb-4 text-gray-400" size={48} />
-              <p className="text-gray-600">No applications found</p>
+              <p className="text-gray-600">
+                {applications.length === 0 ? 'No applications found' : 'No matching applications'}
+              </p>
+              {applications.length === 0 && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Applications will appear here once users submit them.
+                </p>
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -416,6 +562,14 @@ const AdminDashboard = () => {
                               <option value="completed">Completed</option>
                               <option value="rejected">Rejected</option>
                             </select>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteApplication(app.id, app.companyName)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              <XCircle size={14} />
+                            </Button>
                           </div>
                         </td>
                       </tr>
