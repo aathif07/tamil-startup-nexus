@@ -9,7 +9,7 @@ const ServicesSection = () => {
       icon: Building,
       title: 'Startup Incorporation',
       description: 'Complete startup incorporation services including company registration, legal documentation, and compliance setup.',
-      price: '₹10,000',
+      price: '₹15,000',
       color: 'from-red-500 to-pink-500',
       features: ['Company Registration', 'Legal Documentation', 'Compliance Setup', 'Tax Registration']
     },
