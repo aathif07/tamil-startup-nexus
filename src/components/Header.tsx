@@ -7,6 +7,10 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Check if user is authenticated
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  const userRole = localStorage.getItem('userRole');
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -53,6 +57,19 @@ const Header = () => {
       top: 0,
       behavior: 'smooth'
     });
+  };
+
+  const handleAuthClick = () => {
+    if (isAuthenticated) {
+      // Redirect to appropriate dashboard
+      if (userRole === 'admin') {
+        window.location.href = '/admin-dashboard';
+      } else {
+        window.location.href = '/user-dashboard';
+      }
+    } else {
+      window.location.href = '/login';
+    }
   };
 
   return (
@@ -109,9 +126,9 @@ const Header = () => {
           >
             <Button 
               className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 shadow-lg"
-              onClick={() => handleNavClick('#contact')}
+              onClick={handleAuthClick}
             >
-              Apply Now
+              {isAuthenticated ? 'Dashboard' : 'Login'}
             </Button>
           </motion.div>
 
@@ -146,9 +163,9 @@ const Header = () => {
                 ))}
                 <Button 
                   className="bg-red-600 hover:bg-red-700 text-white w-full mt-4"
-                  onClick={() => handleNavClick('#contact')}
+                  onClick={handleAuthClick}
                 >
-                  Apply Now
+                  {isAuthenticated ? 'Dashboard' : 'Login'}
                 </Button>
               </nav>
             </motion.div>
